@@ -3,6 +3,7 @@ Defines a class (`HitCounter`) modeling a REST API hit counter.
 """
 from aws_cdk import aws_dynamodb as ddb
 from aws_cdk import aws_lambda as _lambda
+from aws_cdk import RemovalPolicy
 from constructs import Construct
 
 
@@ -48,6 +49,7 @@ class HitCounter(Construct):
         self._table = ddb.Table(
             self, 'Hits',
             partition_key={'name': 'path', 'type': ddb.AttributeType.STRING},
+            removal_policy=RemovalPolicy.DESTROY,
         )
 
         # Instantiate AWS Lambda function.
