@@ -23,10 +23,14 @@ def handler(event, context):
     """
 
     print(f'request: {json.dumps(event)}')
+
+    user = event['requestContext']['identity']['user']
+    path = event['path']
+
     return {
         'statusCode': 200,
         'headers': {
             'Content-Type': 'text/plain',
         },
-        'body': 'Hello, CDK! You have hit {}\n'.format(event['path']),
+        'body': f'Hello, {user}! You have hit {path}\n',
     }
