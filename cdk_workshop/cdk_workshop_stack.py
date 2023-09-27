@@ -12,6 +12,8 @@ from aws_cdk import Duration
 from aws_cdk import Stack
 from constructs import Construct
 
+from .hitcounter import HitCounter
+
 
 # SECTION: CLASSES ========================================================== #
 
@@ -58,8 +60,14 @@ class CdkWorkshopStack(Stack):
             handler='hello.handler',
         )
 
+        # Instantiate REST API hit counter construct.
+        hello_with_counter = HitCounter(
+            self, 'HelloHitCounter',
+            downstream=my_lambda,
+        )
+
         # Add LambdaRestApi construct to AWS CDK stack.
         apigw.LambdaRestApi(
             self, 'Endpoint',
-            handler=my_lambda,
+            handler=hello_with_counter.handler,
         )
