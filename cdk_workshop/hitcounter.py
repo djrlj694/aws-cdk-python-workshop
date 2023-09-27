@@ -40,11 +40,13 @@ class HitCounter(Construct):
         """
         super().__init__(scope, construct_id, **kwargs)
 
+        # Instantiate AWS DynamoDB table.
         table = ddb.Table(
             self, 'Hits',
             partition_key={'name': 'path', 'type': ddb.AttributeType.STRING},
         )
 
+        # Instantiate AWS Lambda function.
         self._handler = _lambda.Function(
             self, 'HitCountHandler',
             runtime=_lambda.Runtime.PYTHON_3_7,
@@ -55,3 +57,9 @@ class HitCounter(Construct):
                 'HITS_TABLE_NAME': table.table_name,
             },
         )
+
+        # Allow AWS Lambda function to read/write AWS DynamoDB table.
+        table.grant_read_write_data(self._handler)
+
+        # Allow hit counter to invoke downstream AWS Lambda function.
+        downstream.grant_invoke(self._handler)
