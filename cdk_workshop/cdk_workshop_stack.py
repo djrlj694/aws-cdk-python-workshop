@@ -10,6 +10,7 @@ from aws_cdk import aws_sns_subscriptions as subs
 from aws_cdk import aws_sqs as sqs
 from aws_cdk import Duration
 from aws_cdk import Stack
+from cdk_dynamo_table_view import TableViewer
 from constructs import Construct
 
 from .hitcounter import HitCounter
@@ -70,4 +71,12 @@ class CdkWorkshopStack(Stack):
         apigw.LambdaRestApi(
             self, 'Endpoint',
             handler=hello_with_counter.handler,
+        )
+
+        # Add TableViewer construct to AWS CDK stack.
+        TableViewer(
+            self,
+            'ViewHitCounter',
+            title='Hello Hits',
+            table=hello_with_counter.table,
         )
