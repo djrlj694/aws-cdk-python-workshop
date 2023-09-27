@@ -3,6 +3,7 @@ Defines a class (`CdkWorkshopStack`) modeling a custom AWS CDK stack for use in
 the CDK application represented by this software project.
 """
 # from aws_cdk import aws_iam as iam
+from aws_cdk import aws_apigateway as apigw
 from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_sns as sns
 from aws_cdk import aws_sns_subscriptions as subs
@@ -57,4 +58,8 @@ class CdkWorkshopStack(Stack):
             handler='hello.handler',
         )
 
-        print(my_lambda)
+        # Add LambdaRestApi construct to AWS CDK stack.
+        apigw.LambdaRestApi(
+            self, 'Endpoint',
+            handler=my_lambda,
+        )
