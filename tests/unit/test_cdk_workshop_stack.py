@@ -3,6 +3,7 @@ Tests the creation of AWS CDK services.
 """
 import aws_cdk as core
 import aws_cdk.assertions as assertions
+import pytest
 from aws_cdk import aws_lambda as _lambda
 from aws_cdk import Stack
 
@@ -11,6 +12,25 @@ from cdk_workshop.hitcounter import HitCounter
 
 
 # SECTION: TESTS ============================================================ #
+
+
+def test_dynamodb_raises():
+    """
+    Tests if a AWS DynamoDB table's read capacity is in its allowed range.
+    """
+    stack = Stack()
+
+    with pytest.raises(Exception):
+        HitCounter(
+            stack, 'HitCounter',
+            downstream=_lambda.Function(
+                stack, 'TestFunction',
+                runtime=_lambda.Runtime.PYTHON_3_7,
+                handler='hello.handler',
+                code=_lambda.Code.from_asset('lambda'),
+            ),
+            read_capacity=1,
+        )
 
 
 def test_dynamodb_table_created():
