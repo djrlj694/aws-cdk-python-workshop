@@ -8,6 +8,7 @@ from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_sns as sns
 from aws_cdk import aws_sns_subscriptions as subs
 from aws_cdk import aws_sqs as sqs
+from aws_cdk import CfnOutput
 from aws_cdk import Duration
 from aws_cdk import Stack
 from cdk_dynamo_table_view import TableViewer
@@ -23,6 +24,14 @@ class CdkWorkshopStack(Stack):
     """
     A class modeling an AWS CDK stack.
     """
+
+    @property
+    def hc_endpoint(self):
+        return self._hc_endpoint
+
+    @property
+    def hc_viewer_url(self):
+        return self._hc_viewer_url
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         """
@@ -68,15 +77,25 @@ class CdkWorkshopStack(Stack):
         )
 
         # Add LambdaRestApi construct to AWS CDK stack.
-        apigw.LambdaRestApi(
+        gateway = apigw.LambdaRestApi(
             self, 'Endpoint',
             handler=hello_with_counter.handler,
         )
 
         # Add TableViewer construct to AWS CDK stack.
-        TableViewer(
+        tv = TableViewer(
             self,
             'ViewHitCounter',
             title='Hello Hits',
             table=hello_with_counter.table,
+        )
+
+        self._hc_endpoint = CfnOutput(
+            self, 'GatewayUrl',
+            value=gateway.url,
+        )
+
+        self._hc_viewer_url = CfnOutput(
+            self, 'TableViewerUrl',
+            value=tv.endpoint,
         )
