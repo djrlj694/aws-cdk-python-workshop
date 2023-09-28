@@ -28,6 +28,7 @@ class HitCounter(Construct):
         scope: Construct,
         construct_id: str,
         downstream: _lambda.IFunction,
+        read_capacity: int = 5,
         **kwargs,
     ) -> None:
         """
@@ -42,7 +43,20 @@ class HitCounter(Construct):
             The stack's construct ID.
         `downstream` : `_lambda.IFunction`
             An AWS Lambda function.
+        `read_capacity` : `int`, optional
+            The AWS DynamoDB table's read capacity, by default 5.
+
+        Raises
+        ------
+        ValueError
+            The AWS DynamoDB table's read capacity is not within the allowed
+            range.
         """
+        if read_capacity < 5 or read_capacity > 20:
+            raise ValueError(
+                '"read_capacity" must be greater than 5 or less than 20',
+            )
+
         super().__init__(scope, construct_id, **kwargs)
 
         # Instantiate AWS DynamoDB table.
@@ -50,6 +64,7 @@ class HitCounter(Construct):
             self, 'Hits',
             partition_key={'name': 'path', 'type': ddb.AttributeType.STRING},
             encryption=ddb.TableEncryption.AWS_MANAGED,
+            read_capacity=read_capacity,
             removal_policy=RemovalPolicy.DESTROY,
         )
 
